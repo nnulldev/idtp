@@ -141,16 +141,18 @@ pub struct IdtpHeader {
     pub device_id: u16,
     /// Value to used for simple error detection.
     pub checksum: u16,
-    /// Sensors flags that IMU contain.
-    pub sensors: u32,
     /// Timestamp from the IMU's MCU internal clock.
     pub timestamp: u32,
     /// Sequence number of IDTP packet sent.
-    pub packet_num: u32,
-    /// Size of packet payload in bytes (header and trailer size excluded).
-    pub size: u32,
+    pub sequence: u32,
     /// Cyclic Redundancy Check - value to used for complex error detection.
     pub crc: u32,
+    /// Size of packet payload in bytes.
+    pub payload_size: u32,
+    /// Packet payload type.
+    pub payload_type: u8,
+    /// Reserved field.
+    pub reserved: [u8; 3],
 }
 
 /// Size of IDTP header in bytes.
@@ -180,11 +182,12 @@ impl IdtpHeader {
         buffer[7] = self.mode as u8;
         buffer[8..10].copy_from_slice(&self.device_id.to_be_bytes());
         buffer[10..12].copy_from_slice(&self.checksum.to_be_bytes());
-        buffer[12..16].copy_from_slice(&self.sensors.to_be_bytes());
-        buffer[16..20].copy_from_slice(&self.timestamp.to_be_bytes());
-        buffer[20..24].copy_from_slice(&self.packet_num.to_be_bytes());
-        buffer[24..28].copy_from_slice(&self.size.to_be_bytes());
-        buffer[28..32].copy_from_slice(&self.crc.to_be_bytes());
+        buffer[12..16].copy_from_slice(&self.timestamp.to_be_bytes());
+        buffer[16..20].copy_from_slice(&self.sequence.to_be_bytes());
+        buffer[20..24].copy_from_slice(&self.crc.to_be_bytes());
+        buffer[24..28].copy_from_slice(&self.payload_size.to_be_bytes());
+        buffer[28..29].copy_from_slice(&self.payload_type.to_be_bytes());
+        buffer[29..32].copy_from_slice(&self.reserved);
         buffer
     }
 }
@@ -205,13 +208,15 @@ impl From<&[u8]> for IdtpHeader {
         header.mode = Mode::from(bytes[7]);
         header.device_id = u16::from_be_bytes([bytes[8], bytes[9]]);
         header.checksum = u16::from_be_bytes([bytes[10], bytes[11]]);
-        header.sensors = u32::from_be_bytes(bytes[12..16].try_into().unwrap());
         header.timestamp =
-            u32::from_be_bytes(bytes[16..20].try_into().unwrap());
-        header.packet_num =
-            u32::from_be_bytes(bytes[20..24].try_into().unwrap());
-        header.size = u32::from_be_bytes(bytes[24..28].try_into().unwrap());
-        header.crc = u32::from_be_bytes(bytes[28..32].try_into().unwrap());
+            u32::from_be_bytes(bytes[12..16].try_into().unwrap());
+        header.sequence = u32::from_be_bytes(bytes[16..20].try_into().unwrap());
+        header.crc = u32::from_be_bytes(bytes[20..24].try_into().unwrap());
+        header.payload_size =
+            u32::from_be_bytes(bytes[24..28].try_into().unwrap());
+        header.payload_type =
+            u8::from_be_bytes(bytes[28..29].try_into().unwrap());
+        header.reserved.copy_from_slice(&bytes[29..32]);
         header
     }
 }
