@@ -88,6 +88,8 @@ pub enum Mode {
     ///
     /// Both `checksum` and `crc` fields of IDTP header are used.
     Safety = 0x01,
+    /// Unknown mode value. No special handling required.
+    Unknown = 0xff,
 }
 
 impl From<u8> for Mode {
@@ -102,7 +104,7 @@ impl From<u8> for Mode {
         match byte {
             0x00 => Mode::Normal,
             0x01 => Mode::Safety,
-            _ => Mode::Normal,
+            _ => Mode::Unknown,
         }
     }
 }
