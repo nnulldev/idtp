@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0.
 // Copyright (C) 2025-present idtp project and contributors.
 
-//! Inertial Measurement Unit Data Transfer Protocol (IDTP) implementation.
+//! Inertial Measurement Unit Data Transfer Protocol frame implementation.
 
 use crate::{IDTP_HEADER_SIZE, IDTP_TRAILER, IDTP_TRAILER_SIZE, IdtpHeader};
 
@@ -16,9 +16,9 @@ pub const IDTP_PACKET_MIN_SIZE: usize = IDTP_HEADER_SIZE + IDTP_TRAILER_SIZE;
 pub const IDTP_PAYLOAD_MAX_SIZE: usize =
     IDTP_PACKET_MAX_SIZE - IDTP_HEADER_SIZE - IDTP_TRAILER_SIZE;
 
-/// Inertial Measurement Unit Data Transfer Protocol management struct.
+/// Inertial Measurement Unit Data Transfer Protocol frame struct.
 #[derive(Debug, Clone, Copy)]
-pub struct Idtp {
+pub struct IdtpFrame {
     /// IDTP network packet header.
     header: IdtpHeader,
     /// Value that containing IMU data.
@@ -27,11 +27,11 @@ pub struct Idtp {
     payload_size: usize,
 }
 
-impl Idtp {
-    /// Construct new `Idtp` struct.
+impl IdtpFrame {
+    /// Construct new `IdtpFrame` struct.
     ///
     /// # Returns
-    /// - New `Idtp` struct.
+    /// - New `IdtpFrame` struct.
     pub fn new() -> Self {
         Self {
             header: IdtpHeader::new(),
@@ -120,26 +120,26 @@ impl Idtp {
     }
 }
 
-impl Default for Idtp {
-    /// Construct new default `Idtp` struct.
+impl Default for IdtpFrame {
+    /// Construct new default `IdtpFrame` struct.
     ///
     /// # Returns
-    /// - New default `Idtp` struct.
+    /// - New default `IdtpFrame` struct.
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl From<&[u8]> for Idtp {
-    /// Convert byte slice to IDTP managing struct.
+impl From<&[u8]> for IdtpFrame {
+    /// Convert byte slice to IDTP frame.
     ///
     /// # Parameters
     /// - `bytes` - given byte slice to convert (big-endian byte order).
     ///
     /// # Returns
-    /// - IDTP managins struct from byte slice.
+    /// - IDTP frame struct from byte slice.
     fn from(bytes: &[u8]) -> Self {
-        let mut idtp = Idtp::new();
+        let mut idtp = IdtpFrame::new();
         idtp.header = IdtpHeader::from(&bytes[0..IDTP_HEADER_SIZE]);
         idtp.payload_size = bytes.len() - IDTP_HEADER_SIZE - IDTP_TRAILER_SIZE;
 

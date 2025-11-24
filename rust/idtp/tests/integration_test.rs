@@ -80,9 +80,9 @@ mod tests {
     }
 
     #[test]
-    fn test_idtp_creation() {
-        let idtp = Idtp::new();
-        println!("IDTP packet size: {} bytes", size_of_val(&idtp));
+    fn test_idtp_frame_creation() {
+        let idtp = IdtpFrame::new();
+        println!("IDTP frame size: {} bytes", size_of_val(&idtp));
     }
 
     // -----------------------------------------------------------------------
@@ -110,7 +110,7 @@ mod tests {
     }
 
     #[test]
-    fn test_payload_serialization_and_idtp() {
+    fn test_payload_serialization_and_reconstruction() {
         let payload = TestPayload {
             acc_x: 1.1,
             acc_y: 2.2,
@@ -122,7 +122,7 @@ mod tests {
 
         let payload_bytes = payload.as_bytes();
 
-        let mut idtp = Idtp::new();
+        let mut idtp = IdtpFrame::new();
         idtp.set_payload(&payload_bytes);
 
         let idtp_payload = idtp.payload();
@@ -150,7 +150,7 @@ mod tests {
         let payload_bytes = payload_struct.as_bytes();
         println!("Payload bytes: {payload_bytes:?}");
 
-        let mut idtp = Idtp::new();
+        let mut idtp = IdtpFrame::new();
         idtp.set_payload(&payload_bytes);
 
         println!("Idtp: {idtp:?}");
@@ -184,7 +184,7 @@ mod tests {
 
         let payload_bytes = payload_struct.as_bytes();
 
-        let mut idtp = Idtp::new();
+        let mut idtp = IdtpFrame::new();
         idtp.set_payload(&payload_bytes);
 
         let mut small_buffer = vec![0u8; IDTP_PACKET_MIN_SIZE - 1];
