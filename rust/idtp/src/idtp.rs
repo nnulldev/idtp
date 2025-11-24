@@ -142,8 +142,9 @@ impl From<&[u8]> for Idtp {
         let mut idtp = Idtp::new();
         idtp.header = IdtpHeader::from(&bytes[0..IDTP_HEADER_SIZE]);
         idtp.payload_size = bytes.len() - IDTP_HEADER_SIZE - IDTP_TRAILER_SIZE;
-        idtp.payload
-            .copy_from_slice(&bytes[IDTP_HEADER_SIZE..idtp.payload_size]);
+
+        let copy_range = IDTP_HEADER_SIZE..IDTP_HEADER_SIZE + idtp.payload_size;
+        idtp.payload[0..idtp.payload_size].copy_from_slice(&bytes[copy_range]);
         idtp
     }
 }
