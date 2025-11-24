@@ -35,9 +35,22 @@ impl Payload {
     /// 
     /// # Returns
     /// - Payload byte array.
-    fn as_bytes(&self) -> [u8; PAYLOAD_SIZE] {
+    pub fn as_bytes(&self) -> [u8; PAYLOAD_SIZE] {
         unsafe {
             mem::transmute::<Self, [u8; PAYLOAD_SIZE]>(*self)
+        }
+    }
+
+    /// Convert a byte slice to a `Payload` struct.
+    /// 
+    /// # Parameters
+    /// - `bytes` - given bytes to convert.
+    /// 
+    /// # Returns
+    /// - Payload from bytes.
+    pub fn from_bytes(bytes: &[u8; PAYLOAD_SIZE]) -> Self {
+        unsafe {
+            mem::transmute::<[u8; PAYLOAD_SIZE], Self>(*bytes)
         }
     }
 }
@@ -75,11 +88,11 @@ fn main() {
     header.mode = Mode::Normal;
     header.device_id = 0xABCD;
     header.checksum = calculate_checksum();
-    header.sensors = 0;
     header.timestamp = 0;
-    header.packet_num = 0;
-    header.size = payload_bytes.len() as u32;
+    header.sequence = 0;
     header.crc = 0;
+    header.payload_size = payload_bytes.len() as u32;
+    header.payload_type = 0;
 
     println!("Header: {header:#X?}");
     println!("Payload bytes: {payload_bytes:X?}");
@@ -110,5 +123,12 @@ fn main() {
 
     println!("Header: {header:#X?}");
     println!("Payload: {payload:X?}");
+
+    let mut buffer = [0u8; PAYLOAD_SIZE];
+    buffer.copy_from_slice(payload);
+
+    let payload = Payload::from_bytes(&buffer);
+    println!("Payload: {payload:#X?}");
+
     // Handle this IDTP frame...
 }
