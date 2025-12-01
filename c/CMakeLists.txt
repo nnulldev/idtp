@@ -16,7 +16,7 @@ set(SRC_DIR     ${CMAKE_SOURCE_DIR}/src)
 set(TESTS_DIR   ${CMAKE_SOURCE_DIR}/tests)
 
 # Project source files.
-set(SRCS "${SRC_DIR}/idtp_header.c" "${SRC_DIR}/utils.c")
+set(SRCS "${SRC_DIR}/idtp_header.c" "${SRC_DIR}/idtp.c" "${SRC_DIR}/utils.c")
 
 # Static library from C sources.
 add_library(${PROJECT_NAME} STATIC ${SRCS})
@@ -31,6 +31,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC ${INCLUDE_DIR})
 
 # -----------------------------------------------------------------------------
 
+enable_testing()
+
 # C++ standard for tests.
 set(CMAKE_CXX_STANDARD 17)          # Using C++ standard.
 set(CMAKE_CXX_STANDARD_REQUIRED ON) # Enforce the standard.
@@ -44,9 +46,12 @@ set(TESTS_EXE_NAME idtp_tests)
 add_executable(${TESTS_EXE_NAME})
 
 # Project test source files.
-target_sources(${TESTS_EXE_NAME} PRIVATE "${TESTS_DIR}/tests.cc")
+target_sources(${TESTS_EXE_NAME} PRIVATE
+        "${TESTS_DIR}/test_idtp_header.cc"
+        "${TESTS_DIR}/test_idtp_frame.cc"
+)
 
-# Link GTest and pthread to tests.
+# Link libraries to tests.
 target_link_libraries(${TESTS_EXE_NAME} PRIVATE
         GTest::GTest GTest::Main pthread
         ${PROJECT_NAME}
@@ -54,3 +59,4 @@ target_link_libraries(${TESTS_EXE_NAME} PRIVATE
 
 # Include project directories for tests.
 target_include_directories(${TESTS_EXE_NAME} PRIVATE ${INCLUDE_DIR})
+add_test(NAME ${TESTS_EXE_NAME} COMMAND ${TESTS_EXE_NAME})
