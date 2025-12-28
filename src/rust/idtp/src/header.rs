@@ -139,7 +139,7 @@ pub struct IdtpHeader {
     pub mode: Mode,
     /// IMU device identifier.
     pub device_id: u16,
-    /// Value to used for simple error detection.
+    /// Value used for simple error detection.
     pub checksum: u16,
     /// Timestamp from the IMU's MCU internal clock.
     pub timestamp: u32,
